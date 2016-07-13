@@ -1,87 +1,25 @@
 language: c
 compiler: gcc
+script: make all
+before_install:
+  - sudo apt-get update  -qq
+  - sudo apt-get install -qq gcc-multilib
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "bidqtKf7+U117f7wDLgbBu/zWKdTZFiWNAHUOZvG0BJkQMsi7d5V47Kd7yagoX/yGCcXDPJtw3WADd3Qy0alM0h7673tvjxykqRI+fAHQCn2fMPE6MjmGdjm0lE60lVkbV81K9A2iIxmSraL3fznmh90t1KNigcOkbKMQ2ElBl0="
+
+addons:
+  coverity_scan:
+    project:
+      name: "Cyan4973/zstd"
+      description: "Build submitted via Travis CI"
+    notification_email: yann.collet.73@gmail.com
+    build_command_prepend: "make clean"
+    build_command:   "make"
+    branch_pattern: coverity_scan
+
 matrix:
   fast_finish: true
-  include:
-    # Container-based Ubuntu 12.04 LTS Server Edition 64 bit (doesn't support 32-bit includes)
-    - os: linux
-      sudo: false
-      env: PLATFORM="Ubuntu 12.04 container" CMD="make travis-install"
-    - os: linux
-      sudo: false
-      env: PLATFORM="Ubuntu 12.04 container" CMD="make cmaketest"
-    - os: linux
-      sudo: false
-      env: PLATFORM="Ubuntu 12.04 container" CMD="make test"
-    - os: linux
-      sudo: false
-      env: PLATFORM="Ubuntu 12.04 container" CMD="make -C programs test-zstd_nolegacy"
-    - os: linux
-      sudo: false
-      env: PLATFORM="Ubuntu 12.04 container" CMD="make usan"
-    - os: linux
-      sudo: false
-      env: PLATFORM="Ubuntu 12.04 container" CMD="make asan"
-    - os: linux
-      sudo: false
-      env: PLATFORM="Ubuntu 12.04 container" CMD="make zlibwrapper"
-    # Standard Ubuntu 12.04 LTS Server Edition 64 bit
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make libc6install clangtest"
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make gppinstall gpptest"
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make libc6install gnu90test"
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make libc6install c99test"
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make libc6install gnu99test"
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make arminstall armtest"
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make libc6install && make -C programs test32"
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make -C tests versionsTest"
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make libc6install asan32"
-    - os: linux
-      sudo: required
-      env: PLATFORM="Ubuntu 12.04" CMD="make valgrindinstall && make -C programs valgrindTest"
-    # Ubuntu 14.04 LTS Server Edition 64 bit
-    - os: linux
-      dist: trusty
-      sudo: required
-      env: PLATFORM="Ubuntu 14.04" CMD="make gcc5install gcc5test"
-    - os: linux
-      dist: trusty
-      sudo: required
-      env: PLATFORM="Ubuntu 14.04" CMD="make gcc6install gcc6test"
-    - os: linux
-      dist: trusty
-      sudo: required
-      env: PLATFORM="Ubuntu 14.04" CMD="make ppcinstall ppctest"
-    - os: linux
-      dist: trusty
-      sudo: required
-      env: PLATFORM="Ubuntu 14.04" CMD="make zlibwrapper"
-    # OS X Mavericks
-    - os: osx
-      env: PLATFORM="OS X Mavericks" CMD="make travis-install"
-    - os: osx
-      env: PLATFORM="OS X Mavericks" CMD="make gnu90test"
-    - os: osx
-      env: PLATFORM="OS X Mavericks" CMD="make test"
-  exclude:
-    - compiler: gcc
-
-script:
-  - sh -c "$CMD"
